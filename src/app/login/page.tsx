@@ -27,7 +27,11 @@ export default function LoginPage() {
         setError(data.error || 'فشل تسجيل الدخول');
       } else {
         document.cookie = `auth-token=${data.token}; path=/; max-age=604800; SameSite=Strict`;
-        router.push('/');
+        if (data.user?.isAdmin) {
+          router.push('/admin');
+        } else {
+          router.push('/');
+        }
         router.refresh();
       }
     } catch (err) {
@@ -46,27 +50,27 @@ export default function LoginPage() {
         <form onSubmit={handleLogin} className="space-y-4">
           <div>
             <label className="block text-sm text-slate-400 mb-1.5">البريد الإلكتروني</label>
-            <input 
-              type="email" 
-              value={email} 
-              onChange={(e) => setEmail(e.target.value)} 
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               required
               className="w-full bg-[#0f172a] border border-slate-600 rounded-lg px-4 py-3 text-white focus:border-blue-500 outline-none"
             />
           </div>
           <div>
             <label className="block text-sm text-slate-400 mb-1.5">كلمة المرور</label>
-            <input 
-              type="password" 
-              value={password} 
-              onChange={(e) => setPassword(e.target.value)} 
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               required
               className="w-full bg-[#0f172a] border border-slate-600 rounded-lg px-4 py-3 text-white focus:border-blue-500 outline-none"
             />
           </div>
           {error && <div className="bg-red-500/10 border border-red-500/20 text-red-400 p-3 rounded-lg text-sm">{error}</div>}
-          <button 
-            type="submit" 
+          <button
+            type="submit"
             disabled={loading}
             className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-medium transition-colors disabled:opacity-50"
           >
