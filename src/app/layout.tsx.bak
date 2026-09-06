@@ -3,7 +3,7 @@ import "./globals.css";
 import ServiceWorkerRegister from "@/components/ServiceWorkerRegister";
 
 export const metadata: Metadata = {
-  title: "Contracting Management - نظام الإدارة",
+  title: "امتداد جروب - نظام الإدارة",
   description: "نظام إدارة مشاريع المقاولات والعمال",
   manifest: "/manifest.json",
   icons: {
@@ -13,7 +13,7 @@ export const metadata: Metadata = {
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
-    title: "Contracting Management",
+    title: "امتداد جروب",
   },
 };
 

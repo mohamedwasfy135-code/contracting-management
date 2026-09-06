@@ -1,3 +1,20 @@
+#!/bin/bash
+set -e
+
+FILE="src/app/login/page.tsx"
+
+if [ ! -f "$FILE" ]; then
+  echo "الملف مش موجود في المسار: $FILE"
+  echo "شغّل السكريبت من جذر المشروع (المجلد اللي فيه package.json)"
+  exit 1
+fi
+
+# نسخة احتياطية أول حاجة
+cp "$FILE" "${FILE}.bak"
+echo "تم عمل نسخة احتياطية: ${FILE}.bak"
+
+# كتابة النسخة الجديدة
+cat > "$FILE" << 'INNEREOF'
 "use client";
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -44,7 +61,7 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#0b1120]" dir="rtl">
       <div className="bg-[#1e293b] p-8 rounded-2xl border border-slate-700/50 w-full max-w-md shadow-2xl">
-        <h1 className="text-2xl font-bold text-white mb-2 text-center">Contracting Management</h1>
+        <h1 className="text-2xl font-bold text-white mb-2 text-center">امتداد جروب</h1>
         <p className="text-slate-400 text-sm text-center mb-8">سجل دخولك للوصول إلى النظام</p>
         
         <form onSubmit={handleLogin} className="space-y-4">
@@ -81,3 +98,9 @@ export default function LoginPage() {
     </div>
   );
 }
+INNEREOF
+
+echo "تم تحديث $FILE بنجاح."
+echo ""
+echo "الفرق بين النسخة القديمة والجديدة:"
+diff "${FILE}.bak" "$FILE" || true

@@ -1,3 +1,28 @@
+#!/bin/bash
+set -e
+
+echo "==> عمل نسخ احتياطية..."
+cp src/components/Sidebar.tsx src/components/Sidebar.tsx.bak
+cp src/app/layout.tsx src/app/layout.tsx.bak
+cp src/app/admin/page.tsx src/app/admin/page.tsx.bak
+[ -f public/images/logo.png ] && mv public/images/logo.png public/images/logo.png.old
+
+echo "==> إنشاء اللوجو الجديد (SVG)..."
+cat > public/images/logo.svg << 'INNEREOF'
+<svg width="120" height="120" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="grad" x1="0" y1="0" x2="120" y2="120" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#3b82f6"/>
+      <stop offset="1" stop-color="#1e3a8a"/>
+    </linearGradient>
+  </defs>
+  <rect width="120" height="120" rx="24" fill="url(#grad)"/>
+  <text x="60" y="76" font-family="Arial, Helvetica, sans-serif" font-size="46" font-weight="700" fill="#ffffff" text-anchor="middle">CM</text>
+</svg>
+INNEREOF
+
+echo "==> تحديث Sidebar.tsx..."
+cat > src/components/Sidebar.tsx << 'INNEREOF'
 "use client";
 import Image from 'next/image';
 import { useState } from 'react';
@@ -161,3 +186,121 @@ export default function Sidebar({ activeTab, setActiveTab }: { activeTab: string
     </>
   );
 }
+INNEREOF
+
+echo "==> تحديث layout.tsx..."
+cat > src/app/layout.tsx << 'INNEREOF'
+import type { Metadata, Viewport } from "next";
+import "./globals.css";
+import ServiceWorkerRegister from "@/components/ServiceWorkerRegister";
+
+export const metadata: Metadata = {
+  title: "Contracting Management - نظام الإدارة",
+  description: "نظام إدارة مشاريع المقاولات والعمال",
+  manifest: "/manifest.json",
+  icons: {
+    icon: "/icon-192.png",
+    apple: "/apple-touch-icon.png",
+  },
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "Contracting Management",
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#0b1120",
+};
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="ar" dir="rtl">
+      <body className="min-h-screen bg-[#0b1120] text-slate-100 font-sans antialiased">
+        <ServiceWorkerRegister />
+        {children}
+      </body>
+    </html>
+  );
+}
+INNEREOF
+
+echo "==> تحديث login/page.tsx (اسم البرنامج)..."
+sed -i.bak2 's/امتداد جروب/Contracting Management/' src/app/login/page.tsx
+rm -f src/app/login/page.tsx.bak2
+
+echo "==> تحديث admin/page.tsx (إضافة زرار تسجيل خروج)..."
+python3 << 'PYEOF'
+import re
+
+path = "src/app/admin/page.tsx"
+with open(path, "r", encoding="utf-8") as f:
+    content = f.read()
+
+# إضافة import useRouter لو مش موجود
+if "useRouter" not in content:
+    content = content.replace(
+        "import { useState, useEffect } from 'react';",
+        "import { useState, useEffect } from 'react';\nimport { useRouter } from 'next/navigation';"
+    )
+
+# إضافة دالة handleLogout بعد تعريف router
+content = content.replace(
+    "const router = useRouter();",
+    """const router = useRouter();
+
+  const handleLogout = async () => {
+    if (!confirm('هل تريد تسجيل الخروج؟')) return;
+    try {
+      await fetch('/api/auth/logout', { method: 'POST' });
+    } catch (e) {
+      // نتابع تسجيل الخروج محليًا حتى لو فشل الطلب
+    } finally {
+      document.cookie = 'auth-token=; path=/; max-age=0';
+      router.push('/login');
+      router.refresh();
+    }
+  };"""
+)
+
+# إضافة زرار تسجيل الخروج جنب زرار إضافة حساب جديد
+old_header = """        <div className="flex items-center justify-between mb-8">
+          <h1 className="text-3xl font-bold text-white">لوحة إدارة الحسابات</h1>
+          <button
+            onClick={() => setShowAddForm(!showAddForm)}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg font-medium transition"
+          >
+            {showAddForm ? 'إلغاء' : '+ إضافة حساب جديد'}
+          </button>
+        </div>"""
+
+new_header = """        <div className="flex items-center justify-between mb-8">
+          <h1 className="text-3xl font-bold text-white">لوحة إدارة الحسابات</h1>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setShowAddForm(!showAddForm)}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg font-medium transition"
+            >
+              {showAddForm ? 'إلغاء' : '+ إضافة حساب جديد'}
+            </button>
+            <button
+              onClick={handleLogout}
+              className="bg-red-600/10 hover:bg-red-600/20 border border-red-500/20 text-red-400 px-5 py-2.5 rounded-lg font-medium transition"
+            >
+              🚪 تسجيل الخروج
+            </button>
+          </div>
+        </div>"""
+
+content = content.replace(old_header, new_header)
+
+with open(path, "w", encoding="utf-8") as f:
+    f.write(content)
+
+print("تم تحديث admin/page.tsx بنجاح")
+PYEOF
+
+echo ""
+echo "==> اكتمل كل التعديلات بنجاح!"
+echo "==> الفرق في admin/page.tsx:"
+diff src/app/admin/page.tsx.bak src/app/admin/page.tsx || true

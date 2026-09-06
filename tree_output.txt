@@ -1,0 +1,113 @@
+==========================================
+1) المسار الحالي (Current working directory)
+==========================================
+/Users/mohamedwasfy/wasfy project /contracting-management
+
+==========================================
+2) هل فيه package.json هنا؟ (يعني إحنا في جذر مشروع)
+==========================================
+أيوه، package.json موجود هنا.
+اسم المشروع:
+  "name": "imtidad-group",
+
+==========================================
+3) شجرة المشروع (بدون node_modules و .git و .next)
+==========================================
+.
+  tree_output.txt
+  .env.local
+  vercel.json
+  postcss.config.mjs
+  .env.local.backup
+  next-env.d.ts
+  README.md
+  public
+    apple-touch-icon.png
+    file.svg
+    images
+      logo.png
+    icon-192.png
+    vercel.svg
+    manifest.json
+    next.svg
+    globe.svg
+    window.svg
+    sw.js
+    icon-512.png
+  .gitignore
+  package-lock.json
+  package.json
+  tsconfig.json
+  check_tree.sh
+  AGENTS.md
+  eslint.config.mjs
+  CLAUDE.md
+  next.config.ts
+  src
+    middleware.ts
+    app
+      favicon.ico
+      admin
+        page.tsx
+      layout.tsx
+      api
+        payments
+          route.ts
+          [id]
+            route.ts
+        debugschema
+          route.ts
+        daily-logs
+          route.ts
+          [id]
+            route.ts
+        auth
+          logout
+            route.ts
+          login
+            route.ts
+        expenses
+          route.ts
+          [id]
+            route.ts
+        projects
+          route.ts
+          [id]
+            route.ts
+        admin
+          users
+            route.ts
+            [id]
+              route.ts
+        test-db
+          route.ts
+        workers
+          route.ts
+          [id]
+            route.ts
+        backup
+          route.ts
+          import
+            route.ts
+          cron
+            route.ts
+      page.tsx
+      globals.css
+      login
+        page.tsx
+    components
+      DailyLogView.tsx
+      WorkersView.tsx
+      ProjectsView.tsx
+      PartnersView.tsx
+      ExpensesView.tsx
+      Sidebar.tsx
+      SalariesView.tsx
+      ProfitReport.tsx
+      ServiceWorkerRegister.tsx
+      GeneralSummary.tsx
+    lib
+      auth-server.ts
+      supabase.ts
+      db.ts
+      auth.ts
